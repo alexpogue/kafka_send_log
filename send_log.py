@@ -8,12 +8,12 @@ import json
 
 def main():
     if len(sys.argv) < 5:
-        print('Usage: python {} <filename> <cluster> <servicename> <jobid> [<kafka_url:port]'.format(sys.argv[0]))
+        print('Usage: python {} <filename> <cluster> <servicename> <jobid> [topic_name] [<kafka_url:port]'.format(sys.argv[0]))
         sys.exit(1)
 
-    filename, cluster, servicename, jobid = sys.argv[1:5]
+    filename, cluster, servicename, jobid, topic_name = sys.argv[1:6]
 
-    kafka_url_and_port = sys.argv[5] if len(sys.argv) > 5 else 'localhost:9092'
+    kafka_url_and_port = sys.argv[6] if len(sys.argv) > 6 else 'localhost:9092'
     print('kakfa_url_and_port = {}'.format(kafka_url_and_port))
 
     producer = KafkaProducer(bootstrap_servers=[kafka_url_and_port],
@@ -29,7 +29,7 @@ def main():
     data['lines'] = content_appended
 
     print('sending data')
-    producer.send('test-new', value=data)
+    producer.send('{}'.format(topic_name), value=data)
 
 if __name__ == '__main__':
     main()

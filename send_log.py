@@ -22,8 +22,7 @@ def main():
         to_append = ',{},{},{}'.format(cluster, service, job_id)
         content_appended = [''.join([line.strip(), to_append]) for line in content]
 
-    data = {}
-    data['lines'] = content_appended
+    data = {'lines': content_appended}
 
     producer = KafkaProducer(bootstrap_servers=[kafka_url_and_port],
                              value_serializer=lambda x:

@@ -1,35 +1,36 @@
-from time import sleep
-from datetime import datetime
-from kafka import KafkaProducer
-import string
 import sys
 import json
+from kafka import KafkaProducer
 
+def printVals(**kwargs):
+    for name, value in kwargs.items():
+        print('{} = {}'.format(name, value))
 
 def main():
-    if len(sys.argv) < 5:
-        print('Usage: python {} <filename> <cluster> <servicename> <jobid> [topic_name] [<kafka_url:port]'.format(sys.argv[0]))
+    if len(sys.argv) < 6 or len(sys.argv) > 7:
+        print('Usage: python {} <filename> <cluster> <service_name> <job_id> <topic_name> [<kafka_url:port]'.format(sys.argv[0]))
         sys.exit(1)
 
-    filename, cluster, servicename, jobid, topic_name = sys.argv[1:6]
-
+    filename, cluster, service, job_id, topic = sys.argv[1:6]
     kafka_url_and_port = sys.argv[6] if len(sys.argv) > 6 else 'localhost:9092'
-    print('kakfa_url_and_port = {}'.format(kafka_url_and_port))
 
-    producer = KafkaProducer(bootstrap_servers=[kafka_url_and_port],
-                             value_serializer=lambda x:
-                             json.dumps(x).encode('utf-8'))
+    printVals(filename=filename, cluster=cluster, service=service, job_id=job_id, topic=topic, kafka_url_and_port=kafka_url_and_port)
+
     with open(filename) as f:
         content = f.readlines()
 
-        to_append = ',{},{},{}'.format(cluster, servicename, jobid)
+        to_append = ',{},{},{}'.format(cluster, service, job_id)
         content_appended = [''.join([line.strip(), to_append]) for line in content]
 
     data = {}
     data['lines'] = content_appended
 
+    producer = KafkaProducer(bootstrap_servers=[kafka_url_and_port],
+                             value_serializer=lambda x:
+                             json.dumps(x).encode('utf-8'))
+
     print('sending data')
-    producer.send('{}'.format(topic_name), value=data)
+    producer.send('{}'.format(topic), value=data)
 
 if __name__ == '__main__':
     main()

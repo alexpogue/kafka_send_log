@@ -21,10 +21,10 @@ def main():
 
         to_append = ',{},{},{}'.format(cluster, service, job_id)
 
-        first_line = ''.join([content[0], ',clustername,servicename,jobid'])
+        first_line = ''.join([content[0].strip(), ',clustername,servicename,jobid'])
         content_appended = [first_line]
 
-        content_appended.append([''.join([line.strip(), to_append]) for line in content[1:]])
+        content_appended += [''.join([line.strip(), to_append]) for line in content[1:]]
 
 
     data = {'lines': content_appended}
